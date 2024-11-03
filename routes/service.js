@@ -5,8 +5,16 @@ const Model = require("../config/server").Service;
 
 router.post('/',async function(req, res, next){
 try{
-var city= Model.create(req.body );
-return res.json({message:"Successfuly created"})
+   
+if(req.body.id)
+{
+    await Model.update(req.body,{where:{id:req.body.id}})
+    
+    return res.json({message:"Successfuly updated"})
+}
+var property=await Model.create(req.body );
+
+return res.json({message:"Successfuly created",property})
 }
 catch(e)
 {
@@ -41,7 +49,7 @@ router.get('/:id',async function(req, res, next) {
     if(id){
         try
         {
-            $item= await Model.findById(id)
+            $item= await Model.findByPk(id)
 
             return   res.json($item)
         }

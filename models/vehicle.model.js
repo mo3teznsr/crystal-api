@@ -48,9 +48,13 @@ module.exports = function (sequelize, DataTypes) {
     );
 
     Vehicle.associate = function (models) {
+        Vehicle.addScope('defaultScope', {
+            include: ["brand",'model']
+        } )
+        
         Vehicle.belongsTo(models.User, {onDelete: 'cascade', foreignKey: 'userId'});
-        Vehicle.belongsTo(models.Brand, {onDelete: 'cascade', foreignKey: 'brandId'});
-        Vehicle.belongsTo(models.Model, {onDelete: 'cascade', foreignKey: 'modelId'});
+        Vehicle.belongsTo(models.Brand, {onDelete: 'cascade', foreignKey: 'brandId',as:"brand"});
+        Vehicle.belongsTo(models.Model, {onDelete: 'cascade', foreignKey: 'modelId',as:"model"});
     };
     return Vehicle;
 };

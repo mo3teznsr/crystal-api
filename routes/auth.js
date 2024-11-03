@@ -1,4 +1,4 @@
-const Otp= require('../model_old/otp')
+const Otp= require('../config/server').Otp
 const jwt=require('jsonwebtoken')
 const axios = require("axios");
 var express = require('express');
@@ -8,7 +8,51 @@ const auth=require('../middleware/auth');
 const User = require("../config/server").User;
 var bcrypt=require('bcryptjs')
 
-
+const send_sms=(mobile, message)=>{
+  //var myHeaders = new Headers();
+  const myHeaders={"Content-Type": "application/json",
+  "Authorization": "Bearer i4WTrOvvFpIKJbgMcCWO"};
+  
+  var raw = JSON.stringify({
+    "src": "Crystal",
+    "dests": [
+      "966"+mobile
+    ],
+    "body": message,
+    "priority": 0,
+    "delay": 0,
+    "validity": 0,
+    "maxParts": 0,
+    "dlr": 0,
+    "prevDups": 0,
+    "msgClass": "promotional"
+  });
+  
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+  };
+  
+  axios.post("https://api.oursms.com/msgs/sms", {
+    "src": "Crystal",
+    "dests": [
+      "966"+mobile
+    ],
+    "body": message,
+    "priority": 0,
+    "delay": 0,
+    "validity": 0,
+    "maxParts": 0,
+    "dlr": 0,
+    "prevDups": 0,
+    "msgClass": "promotional"
+  },{headers:myHeaders})
+   
+    
+  
+  }
 /* GET users listing. */
 router.post('/login',async(req,res)=>{
   const { mobile, password } = req.body;
@@ -30,7 +74,7 @@ router.post('/login',async(req,res)=>{
     );
     // save user token
     // user
- return   res.status(200).json(token);
+ return   res.status(200).json({token,user});
   }
  return res.status(400).send("Invalid Credentials");
 } catch (err) {
@@ -52,11 +96,11 @@ router.post('/register',async(req,res)=>{
 
     // check if user already exist
     // Validate if user exist in our database
-    const oldMobile = await User.findOne({ mobile });
+    const oldMobile = await User.findOne({where:{ mobile }});
     if (oldMobile) {
       return res.status(409).send({mobile:"validation.mobileExists"});
     }
-    const oldEmail = await User.findOne({ mobile });
+    const oldEmail = await User.findOne({where:{ email }});
     if (oldEmail) {
       return res.status(409).send({email:"validation.emailExists"});
     }
@@ -92,7 +136,7 @@ router.post('/register',async(req,res)=>{
 
     // Create token
     const token = jwt.sign(
-      { id: user._id },
+      { id: user.id },
       process.env.TOKEN_KEY
      
     );
@@ -109,6 +153,46 @@ router.post('/register',async(req,res)=>{
    
   }
 });
+
+router.post('/send-otp',async(req,res)=>{
+ 
+    // Get user input
+    const {mobile } = req.body;
+
+    const oldMobile = await User.findOne({where:{ mobile }});
+    if(!oldMobile)
+    {
+      return res.status(400).send("لم يتم العثور على الرقم الذي أدخلته");
+    }
+    const otp=Math.floor(100000+Math.random()*900000)
+    const otp_obj=await Otp.create({mobile,code:otp})
+    const message = `كود التفعيل الخاص بك هو ${otp}`
+    send_sms(mobile, message)
+    return res.status(200).send("تم ارسال الكود الى رقم الجوال");
+  });
+
+  router.post('/reset',async(req,res)=>{
+ 
+    // Get user input
+    const {mobile,otp,password } = req.body;
+
+    const user = await User.findOne({where:{ mobile }});
+    if(!user)
+    {
+      return res.status(400).send("لم يتم العثور على الرقم الذي أدخلته");
+    }
+    const otp_obj=await Otp.findOne({where:{mobile:mobile,code:otp}})
+    if(!otp_obj)
+    {
+      return res.status(400).send("الكود الذي أدخلته غير صحيح");
+    }
+    const encryptedPassword =  await bcrypt.hash(password, 10);
+    user.password=encryptedPassword;
+    user.save()
+   
+    return res.status(200).send(" تم تغيير كلمة المرور بنجاح");
+  });
+  
 /*
 router.post('/', async(req, res, next)=> {
 
@@ -159,7 +243,7 @@ router.get('/',auth,async function(req, res, next) {
   if(req.user.id)
  { 
   try {
-    var user=await User.findById(req.user.id)
+    var user=await User.findByPk(req.user.id)
     delete user['password']
     res.send(user);
   }

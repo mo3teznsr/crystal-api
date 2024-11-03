@@ -1,16 +1,26 @@
 var express = require('express');
 var router = express.Router();
-const Property=require('../model_old/property')
+//const Property=require('../model_old/property')
 const auth=require('../middleware/auth');
 const Model=require('../config/server').Product
 router.post('/',auth,async function(req, res, next){
 try{
 req.body.user=req.user.id
-var property=await Property.create(req.body );
+if(req.body.id)
+{
+    const item=await Model.findByPk(req.body.id)
+    item.name_en=req.body.name_en
+    item.name_ar=req.body.name_ar
+    item.image=req.body.image 
+    item.isActive=req.body.isActive
+    item.save()
+    return res.json(item)
+}
+var property=await Model.create(req.body );
 //var user=await User.findById(req.user.id)
-console.log(user)
+
 //user.balance=user.balance-20;
-user.save();
+property.save();
 return res.json({message:"Successfuly created",property})
 }
 catch(e)

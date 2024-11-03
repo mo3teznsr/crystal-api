@@ -6,7 +6,7 @@ module.exports = function (sequelize, DataTypes) {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            sericeId: {
+            discount: {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
@@ -26,6 +26,14 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+name_en: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+name_ar: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
             tag: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -42,12 +50,23 @@ module.exports = function (sequelize, DataTypes) {
                 defaultValue: new Date(),
                 field: 'updated_at'
             },
+            is_active:{
+                type:DataTypes.INTEGER,
+                allowNull:true,
+                default:1
+            }
         }
     );
 
     Package.associate = function (models) {
-        Package.belongsTo(models.Service, {onDelete: 'cascade', foreignKey: 'serviceId'});
-        Package.hasMany(models.Product);
+        Package.addScope('defaultScope', {
+            include: ['service']
+        },
+        {// defaultScope already exists, to avoid the error pass override
+            override: true,
+        });
+        Package.belongsTo(models.Service, {onDelete: 'cascade', foreignKey: 'serviceId',as:"service"});
+       // Package.hasMany(models.Product);
      
     };
     return Package;

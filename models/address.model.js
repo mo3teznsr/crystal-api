@@ -10,6 +10,10 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
+            area_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false
+            },
             lat: {
                 type: DataTypes.DECIMAL(20,2),
                 allowNull: false,

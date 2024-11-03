@@ -5,6 +5,12 @@ const auth=require('../middleware/auth');
 
 router.post('/',auth,async function(req, res, next){
 try{
+    if(req.body.id)
+    {
+        await Address.update(req.body,{where:{id:req.body.id}})
+        
+        return res.json({message:"Successfuly updated"})
+    }
 await Address.create({...req.body,userId:req.user.id} );
 return res.json({message:"Successfuly created"})
 }
@@ -36,17 +42,38 @@ router.get('/:id',auth,async function(req, res, next) {
     if(id){
         try
         {
-            amenities= await Address.findById(id)
+            amenities= await Address.findByPk(id)
 
             return   res.json(amenities)
         }
         catch(e)
         {
+            
             return res.status(403).json(e.message)
         }
        
     }
    
+});
+
+router.delete('/:id',auth,async function(req, res, next) {
+    var id=req.params.id
+if(id){
+    try
+    {
+       
+
+        await Address.destroy({where:{id:id}})
+        return   res.json({message:"Successfuly deleted"})
+    }
+    catch(e)
+    {
+        
+        return res.status(403).json(e.message)
+    }
+   
+}
+
 });
 
 

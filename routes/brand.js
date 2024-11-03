@@ -20,7 +20,11 @@ router.put('/:id',async(req,res,next)=>{
 try{
 
 
-await Model.findOneAndUpdate({id:req.params.id},req.body)
+const item= await Model.findByPk(req.params.id)
+  item.image=req.body.image
+item.isActive=req.body.isActive
+item.save()
+
 
 
 
@@ -41,7 +45,7 @@ router.get('/:id',async function(req, res, next) {
     if(id){
         try
         {
-            $item= await Model.findById(id)
+            $item= await Model.findByPk(id)
 
             return   res.json($item)
         }

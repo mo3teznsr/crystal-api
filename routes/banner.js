@@ -20,7 +20,10 @@ router.put('/:id',async(req,res,next)=>{
 try{
 
 
-await Model.findOneAndUpdate({id:req.params.id},req.body)
+const item= await Model.findByPk(req.params.id)
+  item.image=req.body.image
+item.isActive=req.body.isActive
+item.save()
 
 
 
@@ -61,6 +64,12 @@ router.get('/',async function(req, res, next) {
 $cities=await Model.findAll()
 return res.json($cities )
 });
+
+router.delete('/:id',async function(req, res, next) {
+    const item= await Model.findByPk(req.params.id)
+    item.destroy()
+    return res.json({message:"Successfuly deleted"})
+})
 
 
 module.exports = router;

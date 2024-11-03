@@ -16,11 +16,16 @@ module.exports = function (sequelize, DataTypes) {
             
           //  field: 'first_name'
         },
-        // lastName: {
-        //     type: STRING(50),
-        //     allowNull: false,
-        //     field: 'last_name'
-        // },
+         role_id: {
+            type: INTEGER,
+             allowNull: false,
+           
+        },
+        company_id: {
+            type: INTEGER,
+            allowNull: true,
+           
+        },
         mobile: {
             type: STRING(50),
             allowNull: false,
@@ -44,8 +49,13 @@ module.exports = function (sequelize, DataTypes) {
             isEmail: {
                 msg:"auth.email"
             },
-            allowNull: false,
+            allowNull: true,
             
+        },
+        balance:{
+            type: INTEGER,
+            allowNull: true,
+            default:0
         },
         createdAt: {
             type: DATE,
@@ -104,10 +114,13 @@ module.exports = function (sequelize, DataTypes) {
     });
 
     User.associate = function (models) {
+        User.addScope('defaultScope', {
+            include: ["company",]
+        } )
 
         User.hasMany(models.Order);
         User.hasMany(models.Vehicle);
-
+        User.belongsTo(models.Company, {onDelete: 'cascade', foreignKey: 'company_id',as:"company"});
         User.hasMany(models.Address,); //{as: 'Addresses'});
 
 // User.belongsToMany(models.Role, {through: 'UserRole'});

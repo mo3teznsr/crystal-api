@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
             type: STRING(50),
             allowNull: false,
         },
+        is_active:{
+            type: DataTypes.INTEGER,
+            default:1
+        },
         name_en: {
             type: STRING(50),
             allowNull: false,
@@ -30,6 +34,11 @@ module.exports = (sequelize, DataTypes) => {
         price: {
             type: DECIMAL(20, 2),
             allowNull: false,
+        },
+        cashBack:{
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            default:0
         },
         createdAt: {
             type: DATE,

@@ -36,7 +36,7 @@ router.get('/:id',auth,async function(req, res, next) {
     if(id){
         try
         {
-            amenities= await Model.findById(id)
+            amenities= await Model.findOne({where:{id},include:['brand' ,'model']})
 
             return   res.json(amenities)
         }

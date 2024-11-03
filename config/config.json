@@ -1,7 +1,7 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
+    "username": "mo3teznsr",
+    "password": 13347628,
     "database": "crystalclean",
     "host": "127.0.0.1",
     "dialect": "mysql"
@@ -14,8 +14,8 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
+    "username": "mo3teznsr",
+    "password": 13347628,
     "database": "crystalclean",
     "host": "127.0.0.1",
     "dialect": "mysql"
